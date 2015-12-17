@@ -5,7 +5,10 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
@@ -41,11 +44,18 @@ public class ChooseAreaActivity extends Activity {
 	private List<County> countyList;
 	private Province selectedProvince;
 	private City selectedCity;
-	private Province selectedCounty;
+	private County selectedCounty;
 	private int currentLevel;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		SharedPreferences prfs=PreferenceManager.getDefaultSharedPreferences(this);
+		if(prfs.getBoolean("city_selected", false)){
+			Intent intent=new Intent(this, WeatherActivity.class);
+			startActivity(intent);
+			finish();
+			return;
+		}
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area);
 		titleText=(TextView) findViewById(R.id.title_text);
@@ -62,6 +72,12 @@ public class ChooseAreaActivity extends Activity {
 				}else if(currentLevel==CITY_LEVEL){
 					selectedCity=cityList.get(position);
 					queryCounties();
+				}else if(currentLevel==COUNTY_LEVEL){
+					String countyCode=selectedCounty.getCountyCode();
+					Intent intent=new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+					intent.putExtra("county_code", countyCode);
+					startActivity(intent);
+					finish();
 				}
 			}
 			
